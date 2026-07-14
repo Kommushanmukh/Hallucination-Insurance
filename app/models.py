@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 class VerificationRequest(BaseModel):
     claim: str
@@ -10,3 +11,8 @@ class VerificationResponse(BaseModel):
     is_faithful: bool
     confidence_score: float
     reasoning: str
+
+
+class BatchVerificationRequest(BaseModel):
+    claims: List[str]
+    context: str

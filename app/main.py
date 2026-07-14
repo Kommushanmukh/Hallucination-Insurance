@@ -1,8 +1,25 @@
 from fastapi import FastAPI, HTTPException
 from app.models import VerificationRequest, VerificationResponse
 from app.services.verifier import verify_claim
+from typing import List
+from app.models import VerificationRequest, VerificationResponse, BatchVerificationRequest
+
+
 
 app = FastAPI(title="Hallucination Insurance API", version="1.0.0")
+
+@app.post("/verify/batch")
+def verify_batch(request: BatchVerificationRequest):
+    results = []
+    for claim in request.claims:
+        result = verify_claim(claim, request.context)
+        results.append({
+            "claim": claim,
+            "is_faithful": result['is_faithful'],
+            "confidence_score": result['confidence_score'],
+            "reasoning": result['reasoning']
+        })
+    return {"results": results}
 
 @app.get("/health")
 def health_check():
