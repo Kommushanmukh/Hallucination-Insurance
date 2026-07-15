@@ -56,7 +56,7 @@ if st.button("Verify Claim", type="primary"):
                 st.info("Make sure the FastAPI server is running: uvicorn app.main:app --reload")
 
 st.divider()
-st.subheader("📋 Batch Verification")
+st.subheader(" Batch Verification")
 st.caption("Verify multiple claims at once")
 
 batch_claims = st.text_area(
@@ -85,5 +85,50 @@ if st.button("Verify All Claims", type="secondary"):
                     else:
                         st.error(f"❌ {r['claim']} — {r['confidence_score']*100:.0f}% confident")
                         
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+st.divider()
+st.subheader("🔍 Auto Claim Extraction")
+st.caption("Paste an LLM response — we'll extract and verify all claims automatically")
+
+llm_response = st.text_area(
+    "Paste LLM Response",
+    placeholder="Paste any AI-generated text here and we'll verify every claim...",
+    height=150,
+    key="llm_response"
+)
+
+if st.button("Extract & Verify All Claims", type="primary"):
+    if not context or not llm_response:
+        st.error("Please provide both source context and LLM response.")
+    else:
+        with st.spinner("Extracting claims and verifying..."):
+            try:
+                response = requests.post(
+                    "http://127.0.0.1:8000/verify/extract",
+                    json={"text": llm_response, "context": context}
+                )
+                data = response.json()
+                
+                if not data['results']:
+                    st.warning("No claims found in the text.")
+                else:
+                    st.divider()
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Total Claims", data['total_claims'])
+                    with col2:
+                        st.metric("✅ Faithful", data['faithful_count'])
+                    with col3:
+                        st.metric("❌ Hallucinations", data['hallucination_count'])
+                    
+                    st.subheader("Claim by Claim Breakdown")
+                    for r in data['results']:
+                        if r['is_faithful']:
+                            st.success(f"✅ {r['claim']} — {r['confidence_score']*100:.0f}% confident")
+                        else:
+                            st.error(f"❌ {r['claim']} — {r['confidence_score']*100:.0f}% confident")
+                            
             except Exception as e:
                 st.error(f"Error: {e}")

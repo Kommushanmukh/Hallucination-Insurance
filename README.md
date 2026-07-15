@@ -94,3 +94,9 @@ POST /verify/batch
 - ❌ "The Eiffel Tower is in London" → HALLUCINATION (49% confidence)
 - ✅ "The Eiffel Tower is in Paris" → FAITHFUL (70% confidence)
 - ❌ "The Eiffel Tower is 500m tall" → HALLUCINATION (35% confidence)
+
+## Beginner's Guide
+
+New to AI engineering? See [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md) for a
+file-by-file and function-by-function walkthrough of how everything works,
+including the embeddings/vector search/LLM concepts behind it.

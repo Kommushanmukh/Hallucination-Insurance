@@ -5,6 +5,10 @@ class VerificationRequest(BaseModel):
     claim: str
     context: str
 
+class ClaimExtractionRequest(BaseModel):
+    text: str
+    context: str
+
 class VerificationResponse(BaseModel):
     claim: str
     context: str
